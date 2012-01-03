@@ -1,0 +1,87 @@
+<!Doctype html>
+<html>
+ <!-- 
+  code by : tdxev
+  http://www.youtube.com/watch?v=s9Eb67HTl5Q&feature=related
+ 
+  teams   : insecurity.ro
+          : rstcenter.com
+          : rtfm.ro
+ -->
+  <head>
+    <title><?=$this->title?></title>
+      <?=$this->headScript()->prependFile($this->baseUrl('/js/jquery-1.7.1.min.js'))?>
+      <?=$this->headScript()->appendFile($this->baseUrl('/js/jquery-ui-1.8.16.custom.min.js'))?>
+      <?=$this->headScript()->appendFile($this->baseUrl('/js/base.js'))?>
+      <?=$this->headLink()->appendStylesheet($this->baseUrl('/css/style.css'))?>
+      <?=$this->headLink()->appendStylesheet($this->baseUrl('/css/custom-theme/jquery-ui-1.8.16.custom.css'))?>
+    
+    <!-- Send values of variables from php to javascript -->
+    <script>
+      document.app_baseurl =  "<?=$this->baseUrl()?>";
+    </script>
+  </head>
+  <body>
+    <header>
+        <a class="nodecoration" href="<?=$this->baseUrl()?>"><h1>Books Data-Base</h1></a>
+    </header>
+    
+    <nav>
+      <ul>  
+      <?php if (Zend_Auth::getInstance()->hasIdentity()) : ?>
+        <li><a href="<?=$this->baseUrl()?>/user/"><?=Zend_Auth::getInstance()->getIdentity()->username?></a></li> 
+        <li><a href="<?=$this->baseUrl()?>/user/logout">logout</a></li>
+      <?php else:?>
+        <li><a href="<?=$this->baseUrl()?>/user/signup">singup</a></li>
+        <li><a href="<?=$this->baseUrl()?>/user/login">login</a></li>
+      <?php endif; ?>      
+      </ul> 
+    </nav>
+    
+    <div id="content">  
+
+        <div id="mainContent">  
+          <section>
+            <article> 
+              <?=$this->layout()->content?>
+            </article>
+          </section>
+        </div>  
+        
+        <!-- APPLICATION MENU -->
+        <?php $this->aside = Zend_Registry::get('aside'); ?>
+        <aside>
+          <section>
+            <header>
+              <h3><?=$this->aside['title']?></h3>
+            </header>
+            <ul>
+              <?php foreach($this->aside['content'] as $option_url => $option_name)
+              {
+                echo '<li><a href="' . $this->baseUrl() . $option_url . '">' . $option_name . '</a></li>';
+              }
+              ?>
+            </ul>
+          </section>
+        </aside> 
+    </div>      
+
+    <footer>
+      <div>
+        <section>
+          <header>
+            <h3>Parteneri</h3>
+          </header>
+          <ul>
+            <li><a href="javascript:display_message('insecurity.ro','Hard work beats talent when talent doesn`t work hard')">insecurity.ro</a></li>
+            <li><a href="http://rstcenter.com">rstcenter.com</a></li>
+            <li><a href="http://rtfm.ro">rtfm.ro</a></li>
+            <li><a href="http://tdxev.com">tdxev.com</a></li>
+          </ul>
+        </section>
+      </div>
+    </footer>
+ </body>
+</html>
+
+

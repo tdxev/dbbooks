@@ -1,0 +1,21 @@
+<?php 
+  foreach($this->pagesInRange as $page) {
+    if ($this->current != $page)
+    {
+      echo ' | <a href="javascript:goToPage(' . $page . ')">' . $page . '</a> ';
+    }
+    else
+    {
+      echo ' | ' . $page;
+    }
+  }
+   echo ' | '
+?>
+  <script>
+    function goToPage(pageNr)
+    {
+      $("#page").val(pageNr);
+      document.forms["searchform"].submit();
+    }
+  </script>
+

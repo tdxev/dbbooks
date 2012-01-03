@@ -1,0 +1,225 @@
+<?=$this->form?>
+<?php if (isset($this->books) && count($this->books) > 0): ?>
+    
+
+    <table id="tb_books" class="tablesorter">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Author</th>
+          <th>Language</th>
+          <th>Size</th>
+          <th>Category</th>
+          <th>Subcategories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $tr = '<tr>
+                <td><a href="javascript:showBookDetails(%s)">%s</a></td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+              </tr>
+              ';
+
+        foreach($this->books as $row)
+        {
+          printf($tr, 
+            $row->id,
+            $row->title,
+            $row->description,
+            $row->author,
+            $row->language,
+            $row->file_size,
+            $row->category,
+            $row->subcategories);
+        }
+        ?>
+      </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="7"> <?=$this->books->count()?> book(s) found<td>
+      <tr>
+    </tfoot>
+    
+    </table>  
+<?=$this->paginationControl($this->books, 'sliding', 'pagination.phtml')?>
+<?php else: ?>
+  <div>No Books found!</div>
+<?php endif; ?>
+
+
+  <style>
+    .book_details_td_left
+    {
+      text-align: right;
+      vertical-align: top;
+      color: #333;
+      padding-right: 3px;
+    }
+    
+    .book_details_td_left:after
+    {
+      content: ':';
+    }
+    
+    .book_details_td_right
+    {
+      color: #0064CD;
+      padding-left: 3px;
+    }
+  </style>
+  
+<div id="bookdetails" style="display: none;">
+  <div id="bookdetails_loading">Loading book details...</div>
+  <p>
+    <table class="book_details">
+      <tr>
+        <td class="book_details_td_left">Title</td>
+        <td class="book_details_td_right" id="bookdetails_title"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Author</td>
+        <td class="book_details_td_right" id="bookdetails_author"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Description</td>
+        <td class="book_details_td_right" id="bookdetails_description"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Language</td>
+        <td class="book_details_td_right" id="bookdetails_language"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Category</td>
+        <td class="book_details_td_right" id="bookdetails_category"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Subcategories</td>
+        <td class="book_details_td_right" id="bookdetails_subcategories"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Uploader</td>
+        <td class="book_details_td_right" id="bookdetails_uploader"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">Upload date</td>
+        <td class="book_details_td_right" id="bookdetails_creation_date"></td>
+      </tr>
+      <tr>
+        <td class="book_details_td_left">File size</td>
+        <td class="book_details_td_right" id="bookdetails_file_size"></td>
+      </tr>
+    </table>
+  </p>
+  
+  <form id="download_form" method="post" action="<?=$this->baseUrl()?>/download">
+      <input type="hidden" id="file_id"  name="file_id" value="" />
+  </form>
+</div>  
+
+
+
+<script>
+function download(id)
+{
+  $("#file_id").val(id);
+  $("#download_form").submit();
+}
+
+
+
+function showBookDetails(book_id)
+{
+  var params = {
+    'cmd' : 'get_book_details',
+    'params' :
+    {
+      'book_id' : book_id
+    }
+  }
+  ajax(params, updateBookDetails);
+  $("#bookdetails_loading").show();
+  
+  $("#bookdetails").dialog({
+    title : 'Detalii:',
+    modal: true,
+    width : 900,
+    height : 400,
+    buttons : {
+      'Download' : function()
+      {
+          display_message('Information','Downlaod File!');
+          $( this ).dialog( "close" );
+      },
+      'Cancel' : function()
+      {
+        $( this ).dialog( "close" );
+      }
+    }
+  });
+}
+
+function updateBookDetails(respons, params_send)
+{
+  if (respons)
+  {
+    $("#bookdetails_loading").hide();
+    console.log(respons.book.title);
+    console.log(respons.book);
+    $("#bookdetails").dialog({ title : respons.book.title});
+    $('#bookdetails_title').html(respons.book.title);
+    $('#bookdetails_author').html(respons.book.author);
+    $('#bookdetails_description').html(respons.book.title);
+    $('#bookdetails_language').html(respons.book.language);
+    $('#bookdetails_category').html(respons.book.category);
+    $('#bookdetails_subcategories').html(respons.book.subcategories);
+    $('#bookdetails_uploader').html(respons.book.uploader);
+    $('#bookdetails_creation_date').html(respons.book.creation_date);
+    $('#bookdetails_file_size').html(respons.book.file_size);
+  }
+}
+
+
+
+$("#category").change(function()
+{
+  if (parseInt($("#category :selected").val()) == 0)
+  {
+    // clear old subcategory list
+    $("#subcategory").html('');
+    $("#subcategory").append('<option value="0" label="Any Subcategory">Any Subcategory</option>');
+    return;
+  }
+  
+  var params = {
+    'cmd' : 'get_childrens_off_category',
+    'params' : {
+      'category_id' : $("#category :selected").val()
+    }
+  };
+  
+  ajax(params, update_subcategories);
+});
+
+function update_subcategories(respons, params_send)
+{
+  if (respons)
+  {
+    // clear old subcategory list
+    $("#subcategory").html('');
+    // add new subcategories
+    $.each(respons.subcategories, 
+      function(i, val)
+      {
+        $("#subcategory").append('<option value="' + val.id + '" label="' + val.subcategory_name + '">' + val.subcategory_name + '</option>');
+      }
+    )
+  }
+}
+</script>

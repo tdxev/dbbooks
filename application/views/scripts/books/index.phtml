@@ -1,0 +1,59 @@
+<?php if (isset($this->books) && count($this->books) > 0): ?>
+    
+
+    <table id="tb_books" class="tablesorter">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Author</th>
+          <th>Language</th>
+          <th>Size</th>
+          <th>Category</th>
+          <th>Subcategories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $tr = '<tr>
+                <td><a href="javascript:download(%s)">%s</a></td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+              </tr>
+              ';
+
+        foreach($this->books as $row)
+        {
+          printf($tr, 
+            $row->id,
+            $row->title,
+            $row->description,
+            $row->author,
+            $row->language,
+            $row->file_size,
+            $row->category,
+            $row->subcategories);
+        }
+        ?>
+      </tbody>
+    </table>  
+
+<?php endif; ?>
+
+<form id="download_form" method="post" action="<?=$this->baseUrl()?>/download">
+    <input type="hidden" id="file_id"  name="file_id" value="" />
+</form>
+
+
+
+<script>
+function download(id)
+{
+  $("#file_id").val(id);
+$("#download_form").submit();
+}
+</script>

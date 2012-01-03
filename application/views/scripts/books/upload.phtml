@@ -1,0 +1,137 @@
+<?=$this->form?>
+  <div id="addCategory" title="Add new category" style="display: none;">
+    <input id="category_name" type="text" placeholder="Category name"/>
+  </div>
+  <div id="addSubcategory" title="Add new Subcategory" style="display: none;">
+    <p>Add new subcategory for category : "<span id="subcategory_parent">Programare</span> "</p>
+    <input id="subcategory_name" type="text" placeholder="Subcategory name"/>
+  </div>
+<script>
+  // -- on category change update subcategory list
+  $("#category").change(function()
+  {
+    var params = {
+      'cmd' : 'get_childrens_off_category',
+      'params' : {
+        'category_id' : $("#category :selected").val()
+      }
+    };
+
+    ajax(params, update_subcategories);
+  });
+
+
+
+
+  /**
+   * Display add category dialog
+   */
+  function addCategory(){
+    $("#addCategory").dialog({
+      modal: true,
+      'width' : 400,
+      'height' : 160,
+      'buttons' : {
+        'add' : function(){
+          if ($("#category_name").val().length > 0)
+          {
+            var params = {
+              'cmd' : 'add_category',
+              'params' : {
+                'category_name' : $("#category_name").val()
+              }
+            };
+            ajax(params, update_categories);
+            // close add category dialog
+            $('#addCategory').dialog( "close" );
+          }
+          else
+          {
+            display_message('Error','Category name can`t be empty!');
+          }
+        },
+        'Cancel' : function(){$( this ).dialog( "close" );}
+      }
+    });
+  }
+
+
+  /**
+   * Display add subcategory dialog
+   */
+  function addSubcategory(){
+    $("#subcategory_parent").html($("#category :selected").html());
+    $("#addSubcategory").dialog({
+      modal: true,
+      'width' : 400,
+      'height' : 200,
+      'buttons' : {
+        'add' : function(){
+          if ($("#subcategory_name").val().length > 0)
+          {
+            var params = {
+              'cmd' : 'add_subcategory',
+              'params' : {
+                'category_id' : $("#category :selected").val(),
+                'subcategory_name' : $("#subcategory_name").val()
+              }
+            };
+            ajax(params, update_subcategories);
+            // close add category dialog
+            $('#addSubcategory').dialog( "close" );
+          }
+          else
+          {
+            display_message('Error','Subcategory name can`t be empty!');
+          }
+        },
+        'Cancel' : function(){$( this ).dialog( "close" );}
+      }
+    });
+  }
+
+  /**
+   * Update options on select categories
+   * 
+   * @param object response server response object
+   * @param object params_send parameters sent to server
+   */
+  function update_categories(response, params_send)
+  {
+    if (response)
+    {
+      // clear old subcategory list
+      $("#category").html('');
+      // add new subcategories
+      $.each(response.categories, 
+        function(i, val)
+        {
+          $("#category").append('<option value="' + val.id + '" label="' + val.category_name + '">' + val.category_name + '</option>');
+        }
+      )
+    }
+  }
+
+  /**
+   * Update options on select categories
+   * 
+   * @param object response server response object
+   * @param object params_send parameters sent to server
+   */
+  function update_subcategories(response, params_send)
+  {
+    if (response)
+    {
+      // clear old subcategory list
+      $("#subcategory").html('');
+      // add new subcategories
+      $.each(response.subcategories, 
+        function(i, val)
+        {
+          $("#subcategory").append('<option value="' + val.id + '" label="' + val.subcategory_name + '">' + val.subcategory_name + '</option>');
+        }
+      )
+    }
+  }
+ 
+</script>
