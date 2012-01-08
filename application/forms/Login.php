@@ -5,7 +5,7 @@ class Application_Form_Login extends Zend_Form
 
     public function init()
     {
-        /* Form Elements & Other Definitions Here ... */
+      /* Form Elements & Other Definitions Here ... */
       $this->setMethod('post');
 
       $this->addElement('text','username',array(
@@ -23,7 +23,7 @@ class Application_Form_Login extends Zend_Form
         'required' => true
       ));
 
-      $this->addElement('submit','submit',array(
+      $this->addElement('submit','login',array(
         'label' => 'Login',
         'class' => 'button medium white',
         'ignore' => true

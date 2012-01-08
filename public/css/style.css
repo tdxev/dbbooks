@@ -62,11 +62,41 @@ article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section
           padding: 11px 0;  
       }  
 
-      p {  
-          padding-bottom: 22px;  
-      }  
+
+
+/* container that is displayed when javascript is OFF */
+.nojs{
+  position:absolute;
+  width:100%;
+  left: 0;
+  background:#000;
+  color:#F00;
+  font-family:Tahoma, Geneva, sans-serif;
+  font-size:14px;
+  text-align:center;
+}
       
-/****************
+/* ------------[ Book informations table ]------------ */  
+.book_details_td_left
+{
+  text-align: right;
+  vertical-align: top;
+  color: #333;
+  padding-right: 3px;
+}
+
+.book_details_td_left:after
+{
+  content: ':';
+}
+
+.book_details_td_right
+{
+  color: #0064CD;
+  padding-left: 3px;
+}
+      
+ /****************
     Navigation
  *****************/
       
@@ -175,15 +205,17 @@ article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section
     }
   
     #mainContent {  
-        display: table-cell;  
+        display: table-cell;
         width: 620px;  
         padding-right: 22px;
         padding-top: 45px;
     }  
   
-    aside {  
-        display: table-cell;  
+    .aside {  
+        display: table-cell;
         width: 300px;
+        vertical-align: top;
+        padding-top: 45px;
         padding-bottom: 100%; 
     }  
           

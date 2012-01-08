@@ -35,6 +35,7 @@
         <formFile formName="Signup"/>
         <formFile formName="Upload"/>
         <formFile formName="SearchBook"/>
+        <formFile formName="Download"/>
       </formsDirectory>
       <layoutsDirectory>
         <layoutScriptsDirectory>

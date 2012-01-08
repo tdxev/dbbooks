@@ -2,7 +2,6 @@
 
 class Application_Form_SearchBook extends Zend_Form
 {
-
     public function init()
     {
       $this->setMethod('post');
@@ -11,6 +10,7 @@ class Application_Form_SearchBook extends Zend_Form
       $this->addElement('hidden', 'page', array(
        'value' => 1,
        'required' => true,
+       'decorators' => array('ViewHelper'),
        'validators' => array('int'),
        'filters' => array('int')
       ));
@@ -19,7 +19,7 @@ class Application_Form_SearchBook extends Zend_Form
       foreach($search_text_list as $item)
       {
         $this->addElement('text', $item, array(
-         'label' => ucfirst($item),
+         'label' => ucfirst($item) . ': ',
         ));
       }
 

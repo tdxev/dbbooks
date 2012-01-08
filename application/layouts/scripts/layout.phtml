@@ -10,18 +10,25 @@
  -->
   <head>
     <title><?=$this->title?></title>
-      <?=$this->headScript()->prependFile($this->baseUrl('/js/jquery-1.7.1.min.js'))?>
-      <?=$this->headScript()->appendFile($this->baseUrl('/js/jquery-ui-1.8.16.custom.min.js'))?>
-      <?=$this->headScript()->appendFile($this->baseUrl('/js/base.js'))?>
-      <?=$this->headLink()->appendStylesheet($this->baseUrl('/css/style.css'))?>
-      <?=$this->headLink()->appendStylesheet($this->baseUrl('/css/custom-theme/jquery-ui-1.8.16.custom.css'))?>
+      <?=$this->headScript()->prependFile($this->baseUrl('/js/jquery-1.7.1.min.js'))
+                            ->appendFile($this->baseUrl('/js/jquery-ui-1.8.16.custom.min.js'))
+                            ->appendFile($this->baseUrl('/js/base.js'))?>
+      <?=$this->headLink()->appendStylesheet($this->baseUrl('/css/style.css'))
+                          ->appendStylesheet($this->baseUrl('/css/custom-theme/jquery-ui-1.8.16.custom.css'))?>
     
     <!-- Send values of variables from php to javascript -->
     <script>
       document.app_baseurl =  "<?=$this->baseUrl()?>";
+      document.app_fullbaseurl =  "<?='http://' . $_SERVER['HTTP_HOST'] . $this->baseUrl()?>";
+      document.captcha_public_key = "<?=Zend_Registry::get('config')->recaptcha_public_key?>";
     </script>
   </head>
   <body>
+    
+    <noscript>
+      <div class="nojs"><b>Please activate javascript.</b></div>
+    </noscript>
+      
     <header>
         <a class="nodecoration" href="<?=$this->baseUrl()?>"><h1>Books Data-Base</h1></a>
     </header>
@@ -50,20 +57,22 @@
         
         <!-- APPLICATION MENU -->
         <?php $this->aside = Zend_Registry::get('aside'); ?>
-        <aside>
-          <section>
-            <header>
-              <h3><?=$this->aside['title']?></h3>
-            </header>
-            <ul>
-              <?php foreach($this->aside['content'] as $option_url => $option_name)
-              {
-                echo '<li><a href="' . $this->baseUrl() . $option_url . '">' . $option_name . '</a></li>';
-              }
-              ?>
-            </ul>
-          </section>
-        </aside> 
+        <div class="aside">
+          <aside>
+            <section>
+              <header>
+                <h3><?=$this->aside['title']?></h3>
+              </header>
+              <ul>
+                <?php foreach($this->aside['content'] as $option_url => $option_name)
+                {
+                  echo '<li><a href="' . $this->baseUrl() . $option_url . '">' . $option_name . '</a></li>';
+                }
+                ?>
+              </ul>
+            </section>
+          </aside> 
+        </div>
     </div>      
 
     <footer>

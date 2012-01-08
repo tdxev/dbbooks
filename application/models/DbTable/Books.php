@@ -6,19 +6,19 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
 
     /**
      * Add new book to database
-     * 
-     * @
+     * // todo edit params order
      * @param string $title Book name
      * @param string $description Book description
-     * @param string $hash Book hash
      * @param string $author Book author
      * @param int $language_id Primary key from languages
      * @param string $file_location Path to file
+     * @param string $file_hash Book hash
+     * @param string $file_size Book size
      * @param int $category Primary key form category
      * @param array $subcategories array of Primary keys form subcategory
      * @return int Last inserted id
      */
-    public function addNew($title, $description, $author, $language_id, $file_location, $file_size, $hash, $category, $subcategories)
+    public function addNew($title, $description, $author, $language_id, $file_location, $file_size, $file_hash, $category, $subcategories)
     {
       if (is_array($subcategories))
       {
@@ -43,7 +43,8 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
         'uploader' => (int) $identity->id,
         'file_location' => $file_location,
         'file_size' => $file_size,
-        'file_hash' => $hash,
+        'file_url' => $this->SEO($file_hash . ' ' . $title),
+        'file_hash' => $file_hash,
         'category_id' => (int) $category,
         'subcategories' => $subcategories
       );
@@ -110,6 +111,7 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
                         'modification_date', 
                         'uploader' => '(SELECT `username` FROM users WHERE books.uploader = users.id)',
                         'file_size', 
+                        'file_url',
                         'category' => '(SELECT category_name FROM categories WHERE books.category_id = categories.id)', 
                         'subcategories' => '(SELECT GROUP_CONCAT( subcategory_name ) FROM subcategories WHERE LOCATE( CONCAT( ",", subcategories.id, "," ) , books.subcategories ) >= "1")'
                       ))
@@ -120,7 +122,38 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
     }
     
     
-    
+    /**
+     * Return book by primary key of the book
+     * Make subselects to get user/category/subcategory..
+     * 
+     * @param int $book_id Primary Key for the book
+     * @return array 
+     */
+    public function getBookDetailsByHash($book_hash)
+    {
+      $query = $this  ->select()
+                      ->from($this->_name, array(
+                        'id', 
+                        'title', 
+                        'description', 
+                        'content', 
+                        'author', 
+                        'creator', 
+                        'producer', 
+                        'language' => '(SELECT `name` FROM languages WHERE books.language_id = languages.id)', 
+                        'creation_date', 
+                        'modification_date', 
+                        'uploader' => '(SELECT `username` FROM users WHERE books.uploader = users.id)',
+                        'file_size', 
+                        'file_url',
+                        'category' => '(SELECT category_name FROM categories WHERE books.category_id = categories.id)', 
+                        'subcategories' => '(SELECT GROUP_CONCAT( subcategory_name ) FROM subcategories WHERE LOCATE( CONCAT( ",", subcategories.id, "," ) , books.subcategories ) >= "1")'
+                      ))
+                      ->where('`file_hash` = ?', $book_hash);
+      
+      $this->_db->setFetchMode(Zend_Db::FETCH_OBJ);
+      return $this->_db->fetchRow($query->__toString());
+    }
     
     
     /**
@@ -133,6 +166,7 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
     {
       return $this->fetchRow($this->select()->where('`file_hash` = ?', $file_hash));
     }
+    
     
     /**
      * Return book by primary key of the book
@@ -173,6 +207,22 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
     }
     
     
+    /**
+     * Createa a static url address for the book
+     * Credit : http://stackoverflow.com/questions/7539238/sanitizing-urls-using-php-for-seo-friendly
+     *
+     * @param string $input
+     * @return string 
+     */
+    private function SEO($input){ 
+      $input = str_replace("&nbsp;", " ", $input);
+      $input = str_replace(array("'", "-"), "", $input); //remove single quote and dash
+      $input = mb_convert_case($input, MB_CASE_LOWER, "UTF-8"); //convert to lowercase
+      $input = preg_replace("#[^a-zA-Z0-9]+#", "-", $input); //replace everything non an with dashes
+      $input = preg_replace("#(-){2,}#", "$1", $input); //replace multiple dashes with one
+      $input = trim($input, "-"); //trim dashes from beginning and end of string if any
+      return $input; 
+    }
     
     
     /**

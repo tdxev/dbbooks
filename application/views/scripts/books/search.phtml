@@ -8,7 +8,6 @@
           <th>Title</th>
           <th>Description</th>
           <th>Author</th>
-          <th>Language</th>
           <th>Size</th>
           <th>Category</th>
           <th>Subcategories</th>
@@ -18,7 +17,6 @@
         <?php
         $tr = '<tr>
                 <td><a href="javascript:showBookDetails(%s)">%s</a></td>
-                <td>%s</td>
                 <td>%s</td>
                 <td>%s</td>
                 <td>%s</td>
@@ -34,7 +32,6 @@
             $row->title,
             $row->description,
             $row->author,
-            $row->language,
             $row->file_size,
             $row->category,
             $row->subcategories);
@@ -46,34 +43,18 @@
         <td colspan="7"> <?=$this->books->count()?> book(s) found<td>
       <tr>
     </tfoot>
-    
     </table>  
 <?=$this->paginationControl($this->books, 'sliding', 'pagination.phtml')?>
-<?php else: ?>
-  <div>No Books found!</div>
+<?php elseif (isset($this->books)): ?>
+  <br/>
+  <div class="ui-widget">
+    <div class="ui-state-highlight ui-corner-all">
+      <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+      <strong>Info: </strong> No book match your search terms.</p>
+    </div>
+  </div>
 <?php endif; ?>
 
-
-  <style>
-    .book_details_td_left
-    {
-      text-align: right;
-      vertical-align: top;
-      color: #333;
-      padding-right: 3px;
-    }
-    
-    .book_details_td_left:after
-    {
-      content: ':';
-    }
-    
-    .book_details_td_right
-    {
-      color: #0064CD;
-      padding-left: 3px;
-    }
-  </style>
   
 <div id="bookdetails" style="display: none;">
   <div id="bookdetails_loading">Loading book details...</div>
@@ -115,17 +96,19 @@
         <td class="book_details_td_left">File size</td>
         <td class="book_details_td_right" id="bookdetails_file_size"></td>
       </tr>
+      <tr>
+        <td class="book_details_td_left">Book url</td>
+        <td class="book_details_td_right"><a id="bookdetails_file_url" target="_blank"></a></td>
+      </tr>
     </table>
   </p>
-  
-  <form id="download_form" method="post" action="<?=$this->baseUrl()?>/download">
-      <input type="hidden" id="file_id"  name="file_id" value="" />
-  </form>
 </div>  
 
 
-
 <script>
+$("#search").attr('class','ui-button-primary');
+$("#search").button();
+  
 function download(id)
 {
   $("#file_id").val(id);
@@ -154,10 +137,9 @@ function showBookDetails(book_id)
     buttons : {
       'Download' : function()
       {
-          display_message('Information','Downlaod File!');
-          $( this ).dialog( "close" );
+         window.open($("#bookdetails_file_url").attr('href') + '/hidedatails/yes');
       },
-      'Cancel' : function()
+      'Close' : function()
       {
         $( this ).dialog( "close" );
       }
@@ -170,8 +152,6 @@ function updateBookDetails(respons, params_send)
   if (respons)
   {
     $("#bookdetails_loading").hide();
-    console.log(respons.book.title);
-    console.log(respons.book);
     $("#bookdetails").dialog({ title : respons.book.title});
     $('#bookdetails_title').html(respons.book.title);
     $('#bookdetails_author').html(respons.book.author);
@@ -182,9 +162,11 @@ function updateBookDetails(respons, params_send)
     $('#bookdetails_uploader').html(respons.book.uploader);
     $('#bookdetails_creation_date').html(respons.book.creation_date);
     $('#bookdetails_file_size').html(respons.book.file_size);
+    $('#bookdetails_file_url').attr('href',document.app_fullbaseurl + '/books/details/name/' + respons.book.file_url);
+    $('#bookdetails_file_url').html(document.app_fullbaseurl + '/books/details/name/' + respons.book.file_url);
+    $('#bookdetails_file_url').attr('title',respons.book.title);
   }
 }
-
 
 
 $("#category").change(function()

@@ -41,7 +41,7 @@ class Application_Form_Signup extends Zend_Form
         'filters' => array('htmlEntities')
       ));
             
-      $this->addElement('submit','submit',array(
+      $this->addElement('submit','signup',array(
         'label' => 'Signup',
         'class' => 'button medium white',
         'ignore' => true

@@ -121,7 +121,7 @@ class BooksController extends Zend_Controller_Action
         );
         
         $paginator = new Zend_Paginator(new Zend_Paginator_Adapter_DbSelect($qSelect));
-        $paginator->setItemCountPerPage(($this->_getParam('resultsonpage', 1) ))
+        $paginator->setItemCountPerPage(($this->_getParam('resultsonpage', 1) * 10))
                   ->setCurrentPageNumber($this->_getParam('page', 1));
         $this->view->books = $paginator;
 
@@ -188,8 +188,53 @@ class BooksController extends Zend_Controller_Action
       $this->view->form = $form;
     }
 
+    public function detailsAction()
+    {
+      // action body
+      $books = new Application_Model_DbTable_Books();
+      $form = new Application_Form_Download();
+      if ($this->_request->getParam('name') != '')
+      {
+        // get book md5 hash
+        $book_hash = substr($this->_request->getParam('name'),0,32);
+        $book = $books->getBookDetailsByHash($book_hash);
+        if ($book)
+        {
+          if ($this->_request->isPost() && $form->isValid($_POST))
+          {
+            $book = $books->getBookByID($book->id);
+            if (file_exists($book->file_location))
+            {
+              header('Content-Type: application/pdf');
+              header('Content-Disposition: attachment; filename="' . $book->title . '"');
+              readfile($book->file_location);
+            }
+            else
+            {
+              header('HTTP/1.1 404 Not Found');
+              echo "File not found!";
+            }
+            
+            $this->view->layout()->disableLayout();
+            $this->_helper->viewRenderer->setNoRender(true);
+          }
+          
+          
+          $this->view->hidedatails  = (boolean) $this->_request->getParam('hidedatails'); 
+          $this->view->book = $book;
+          $this->view->form = $form;
+        }
+        else
+        {
+        }
+      }
+    }
 
 }
+
+
+
+
 
 
 

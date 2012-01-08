@@ -1,0 +1,76 @@
+<?php if (isset($this->book)):?>
+<div id="bookdetails">
+  <table class="book_details">
+    <tr>
+      <td class="book_details_td_left">Title</td>
+      <td class="book_details_td_right"><?=$this->book->title?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Author</td>
+      <td class="book_details_td_right"><?=$this->book->author?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Description</td>
+      <td class="book_details_td_right"><?=$this->book->description?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Language</td>
+      <td class="book_details_td_right"><?=$this->book->language?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Category</td>
+      <td class="book_details_td_right"><?=$this->book->category?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Subcategories</td>
+      <td class="book_details_td_right"><?=$this->book->subcategories?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Uploader</td>
+      <td class="book_details_td_right"><?=$this->book->uploader?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Upload date</td>
+      <td class="book_details_td_right"><?=$this->book->creation_date?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">File size</td>
+      <td class="book_details_td_right"><?=$this->book->file_size?></td>
+    </tr>
+    <tr>
+      <td class="book_details_td_left">Book url</td>
+      <td class="book_details_td_right"><a href="<?=$this->baseUrl().'/books/details/name/'.$this->book->file_url?>" target="_self"><?=$this->book->title?></a></td>
+    </tr>
+  </table>
+</div>
+<a id="hideshow" href="javascript:showDetails()">Hide Details</a>
+<?=$this->form?>
+<script>
+  
+  $("#download").attr('class','ui-button-primary');
+  $("#download").button();
+  
+  function showDetails(){
+    if (!$('#bookdetails').is(":visible"))
+    {
+      $('#bookdetails').show(1000,'easeOutQuint');
+      $('#hideshow').html('Hide Details');
+    }
+    else
+    {
+      $('#bookdetails').hide(1000,'easeOutQuint');
+      $('#hideshow').html('Show Details');
+    }
+  }
+
+
+  if (<?=($this->hidedatails) ? 'true' : 'false'?>)
+  {
+    $('#bookdetails').hide();
+    $('#hideshow').html('Show Details');
+  }
+
+</script>
+<?php else:?>
+<div>Book has not been found!</div>
+<?php endif;?>

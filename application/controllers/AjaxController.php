@@ -32,6 +32,18 @@ class AjaxController extends Zend_Controller_Action
   }
 
   /**
+   * Return result
+   *
+   * @param string $result_name Name of the result
+   * @param mixed $data Result that will be returned
+   */
+  private function ajaxok($result_name, $result_data){
+    $ajax_result = array('error' => 0, $result_name => $result_data);
+    echo json_encode($ajax_result);
+    exit(0);
+  }
+  
+  /**
    * Display parameters as JSON
    * 
    * @param array $data Array of params that will be send back
@@ -71,12 +83,7 @@ class AjaxController extends Zend_Controller_Action
     if($categories->addCategory($params->category_name))
     {
       $category_list  = $categories->getAll();
-      $respons = array
-      (
-        'error' => 0,
-        'categories'  => $category_list
-      );
-      $this->display_json($respons);
+      $this->ajaxok('categories', $category_list);
     }
     else
     {
@@ -102,12 +109,7 @@ class AjaxController extends Zend_Controller_Action
     if ($subcategories->addSubcategory($params->category_id, $params->subcategory_name))
     {
       $subcategory_list  = $subcategories->getSubcategoriesByCategory($params->category_id);
-      $respons = array
-      (
-        'error' => 0,
-        'subcategories'  => $subcategory_list
-      );
-      $this->display_json($respons);
+      $this->ajaxok('subcategories', $subcategory_list);
     }
     else
     {
@@ -125,12 +127,7 @@ class AjaxController extends Zend_Controller_Action
   {
     $subcategories = new Application_Model_DbTable_Subcategories();
     $subcategory_list = $subcategories->getSubcategoriesByCategory($params->category_id);
-    $respons = array
-    (
-      'error' => 0,
-      'subcategories'  => $subcategory_list
-    );
-    $this->display_json($respons);
+    $this->ajaxok('subcategories', $subcategory_list);
   }
 
   /**
@@ -142,13 +139,7 @@ class AjaxController extends Zend_Controller_Action
   {
     $books = new Application_Model_DbTable_Books();
     $book = $books->getBookDetailsByID($params->book_id);
-    $respons = array
-    (
-      'error' => 0,
-      'book'  => $book
-    );
-    
-    $this->display_json($respons);    
+    $this->ajaxok('book', $book);
   }
 
 }

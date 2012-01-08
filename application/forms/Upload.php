@@ -97,7 +97,7 @@ class Application_Form_Upload extends Zend_Form
       
       
       
-      $this->addElement('submit','submit',array(
+      $this->addElement('submit','upload',array(
         'label' => ' Upload Book ',
         'class' => 'button medium white',
         'ignore' => true
