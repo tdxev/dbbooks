@@ -16,15 +16,11 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        // action body
+      $books = new Application_Model_DbTable_Books();
+      $this->view->books = $books->getAll(10);
+      
+      $this->view->top_uploaders = $books->getTopUploaders(10);
     }
-
-    public function signupAction()
-    {
-        // action body
-    }
-
-
 }
 
 

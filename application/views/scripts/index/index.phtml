@@ -1,1 +1,30 @@
-Welcome to Data Base Books!
+
+<div class="statistics">
+  <?php if (isset($this->books) && count($this->books) > 0): ?>
+  <section>
+    <header>
+      <h4>Latest uploads: </h4>
+    </header>
+    <ul>
+      <?php
+        $template = '<li><a href="%s">%s</a></li>';
+        foreach($this->books as $book) printf($template, $this->baseUrl('books/details/name/'.$book->file_url), $book->title)
+      ?>
+    </ul>
+  </section>
+  <?php endif;?>
+  
+  <?php if (isset($this->top_uploaders) && count($this->top_uploaders) > 0): ?>
+  <section>
+    <header>
+      <h4>Top uploaders:</h4>
+    </header>
+    <ul>
+      <?php
+        $template = '<li>%s ( %s book(s) )</li>';
+        foreach($this->top_uploaders as $uploader) printf($template, $uploader->uploader, $uploader->books_uploaded)
+      ?>
+    </ul>
+  </section>
+  <?php endif;?>
+</div>

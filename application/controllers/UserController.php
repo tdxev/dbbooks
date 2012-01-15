@@ -54,14 +54,23 @@ class UserController extends Zend_Controller_Action
 
         if (!$errors)
         {
+          $activation_key = md5(md5(time()));
           $user = $users->addNew(
             $form->getValue('username'), 
             $form->getValue('password'), 
             $form->getValue('email'),
-            $form->getValue('webpage')
+            $form->getValue('webpage'),
+            $activation_key
           );
           if ($user) 
           {
+            $activation_url = 'http://' . $_SERVER['SERVER_NAME'] . $this->getFrontController()->getBaseUrl() . 'user/activate/email/' . $form->getValue('email') . '/key/' . $activation_key;
+            $mail = new Zend_Mail();
+            $mail->addTo($form->getValue('email'), '');            
+            $mail->setFrom('admin@db-books.com', 'db books');
+            $mail->setSubject('db books account activation.');
+            $mail->setBodyText('Please follow the link to activate your account:<br/>' . $activation_url);
+            $mail->send();
             $this->_helper->redirector('login','user');
             //TODO send mail to validate  email acount that has beeb used
           }
@@ -97,10 +106,19 @@ class UserController extends Zend_Controller_Action
           $result = $auth->authenticate();
           if($result->isValid())
           {
-            // the pair username and password are good
-            $storage = Zend_Auth::getInstance()->getStorage();
-            $storage->write($auth->getResultRowObject(array('id', 'username', 'email', 'webpage')));
-            $this->_helper->redirector('index','user');
+            $user_informations = $auth->getResultRowObject(array('id', 'username', 'email', 'webpage', 'activation_key'));
+            // -- if user account is not activated then inform user 
+            if ($user_informations->activation_key != '')
+            {
+              $form->getElement('username')->addError('Your account has not been activated. Please check your email.');
+            }
+            else
+            {
+              // the pair username and password are good and the account is activated
+              $storage = Zend_Auth::getInstance()->getStorage();
+              $storage->write($user_informations);
+              $this->_helper->redirector('index','user');
+            }
           }
           else
           {
@@ -119,6 +137,14 @@ class UserController extends Zend_Controller_Action
     {
       Zend_Auth::getInstance()->clearIdentity();
       $this->_helper->redirector('index','index');
+    }
+    
+    
+    public function activateAction()
+    {
+      $users = new Application_Model_DbTable_Users();
+      $users->activateAccount($this->_request->getParam('email') , $this->_request->getParam('key'));
+      $this->_helper->redirector('index','user');
     }
 }
 

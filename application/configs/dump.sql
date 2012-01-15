@@ -56,7 +56,7 @@ CREATE TABLE `books` (
   `language_id` INT UNSIGNED NOT NULL,
   `creation_date` DATETIME NOT NULL,
   `modification_date` TIMESTAMP NOT NULL,
-  `uploader` VARCHAR(200) NOT NULL,
+  `uploader` INT UNSIGNED  NOT NULL,
   `file_hash` VARCHAR(32) UNIQUE,
   `file_location` VARCHAR(200) UNIQUE,
   `file_size` VARCHAR(20),
@@ -73,6 +73,7 @@ CREATE TABLE `users` (
   `email`    VARCHAR(100) UNIQUE NOT NULL,
   `webpage`  VARCHAR(255) NOT NULL,
   `group`    INT UNSIGNED NOT NULL,
-  `registration_date` DATETIME NOT NULL
-  `registration_ip` VARCHAR(32) NOT NULL
+  `registration_date` DATETIME NOT NULL,
+  `registration_ip` VARCHAR(32) NOT NULL,
+  `activation_key` VARCHAR(32) NOT NULL
 );

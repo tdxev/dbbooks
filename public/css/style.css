@@ -63,6 +63,17 @@ article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section
       }  
 
 
+.statistics {
+  display: table;
+  padding-bottom: 20px;
+}
+
+.statistics section
+{
+  display:table-cell;
+  width: 300px;
+  padding-left: 10px;
+}
 
 /* container that is displayed when javascript is OFF */
 .nojs{

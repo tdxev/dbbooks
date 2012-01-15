@@ -53,14 +53,13 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
     }
     
     
-
-    
     /**
      * Return all books in database
      * 
+     * @param int $limit Number of rows to extract from database
      * @return array DB-Books rows
      */
-    function getAll()
+    function getAll($limit = 0)
     {
       $query = 'SELECT 
                   id, 
@@ -77,6 +76,7 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
                   file_hash, 
                   file_location, 
                   file_size, 
+                  file_url,
                   (SELECT category_name FROM categories WHERE books.category_id = categories.id) as category, 
                   (SELECT GROUP_CONCAT( subcategory_name ) FROM subcategories WHERE LOCATE( CONCAT( ",", subcategories.id, "," ) , books.subcategories ) >= "1") as subcategories
                 FROM 
@@ -84,8 +84,13 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
                 ORDER BY
                   creation_date
                 DESC';
+
+      if ((int) $limit > 0) {
+        $query .= ' LIMIT 0, ' . (int) $limit;
+      }
       return $this->getAdapter()->fetchAll($query, array(), Zend_Db::FETCH_OBJ);
     }
+    
     
     
     /**
@@ -119,6 +124,24 @@ class Application_Model_DbTable_Books extends Zend_Db_Table_Abstract
       
       $this->_db->setFetchMode(Zend_Db::FETCH_OBJ);
       return $this->_db->fetchRow($query->__toString());
+    }
+    
+    public function getTopUploaders($limit = 0)
+    {
+      $query = $this  ->select()
+                      ->from($this->_name, array( 
+                        'uploader' => '(SELECT `username` FROM users WHERE books.uploader = users.id)',
+                        'books_uploaded' => 'COUNT(uploader)'))
+                      ->group('uploader');
+      
+      
+      if ((int) $limit > 0) {
+        $query->limit((int) $limit);
+        
+      }
+      
+      $this->_db->setFetchMode(Zend_Db::FETCH_OBJ);
+      return $this->_db->fetchAll($query->__toString());
     }
     
     
