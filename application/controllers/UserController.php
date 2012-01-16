@@ -14,7 +14,7 @@ class UserController extends Zend_Controller_Action
       // when user call action that not exist dispaly index page
       $this->_forward('index','index');
     }
-    
+
     public function indexAction()
     {
       // nothing for users index redirect to site base index
@@ -26,6 +26,8 @@ class UserController extends Zend_Controller_Action
 
     /**
      * Add new user to database
+     * 
+     *
      */
     public function signupAction()
     {
@@ -54,7 +56,7 @@ class UserController extends Zend_Controller_Action
 
         if (!$errors)
         {
-          $activation_key = md5(md5(time()));
+          $activation_key = $users->generateHashKey();
           $user = $users->addNew(
             $form->getValue('username'), 
             $form->getValue('password'), 
@@ -72,7 +74,6 @@ class UserController extends Zend_Controller_Action
             $mail->setBodyText('Please follow the link to activate your account:<br/>' . $activation_url);
             $mail->send();
             $this->_helper->redirector('login','user');
-            //TODO send mail to validate  email acount that has beeb used
           }
           
         }
@@ -83,6 +84,8 @@ class UserController extends Zend_Controller_Action
 
     /**
      * User Login
+     * 
+     *
      */
     public function loginAction()
     {
@@ -132,24 +135,97 @@ class UserController extends Zend_Controller_Action
 
     /**
      * Logout user form application
+     * 
+     *
      */
     public function logoutAction()
     {
       Zend_Auth::getInstance()->clearIdentity();
       $this->_helper->redirector('index','index');
     }
-    
-    
+
+    /**
+     * Activate user account 
+     *
+     */
     public function activateAction()
     {
       $users = new Application_Model_DbTable_Users();
       $users->activateAccount($this->_request->getParam('email') , $this->_request->getParam('key'));
       $this->_helper->redirector('index','user');
     }
+
+    /**
+     * Reset user password 
+     *
+     */
+    public function resetpasswordAction()
+    {
+      $form = new Application_Form_Resetpassword();
+      if ($this->_request->isPost() && $form->isValid($_POST))
+      {
+        $users = new Application_Model_DbTable_Users();
+        $user = $users->getUserByEmail($form->getValue('email'));
+        if ($user)
+        {
+          $reset_key = $users->resetPassword($user->id);
+          if ($reset_key)
+          {
+            $reset_password = 'http://' . $_SERVER['SERVER_NAME'] . $this->getFrontController()->getBaseUrl() . 'user/createnewpassword/email/' . $form->getValue('email') . '/key/' . $activation_key;
+            $mail = new Zend_Mail();
+            $mail->addTo($form->getValue('email'), '');            
+            $mail->setFrom('admin@db-books.com', 'db books');
+            $mail->setSubject('db books password reset.');
+            $mail->setBodyText('Please follow the link to reset your password:<br/>' . $reset_password);
+            $mail->send();
+            $this->_helper->redirector('index','index');
+          }
+        }
+        else
+        {
+          $form->getElement('email')->addError('There is no user registered with that email address.');
+        }
+      }
+      $this->view->form = $form;
+    }
+
+    /**
+     * Create a new password for a reset password request
+     */
+    public function createnewpasswordAction()
+    {
+      if ($this->_request->getParam('email') != '' && $this->_request->getParam('key') != '') 
+      {
+        $form = new Application_Form_Createnewpassword();
+        if($this->_request->isPost() && $form->isValid($_POST))
+        {
+          $users = new Application_Model_DbTable_Users();
+          $result = $users->resetPasswordAddNew(
+            $form->getValue('email'), 
+            $form->getValue('key'), 
+            $form->getValue('password')
+          );
+          if ($result)
+          {
+            $this->_helper->redirector('login','user');
+          }
+          else
+          {
+            $this->_helper->redirector('index','index');
+          }
+        }
+        
+        // set hidden values
+        $form->getElement('key')  ->setValue($this->_request->getParam('key'));
+        $form->getElement('email')->setValue($this->_request->getParam('email'));
+        $this->view->form = $form;
+      }
+      else
+      {
+        $this->_helper->redirector('index','index');
+      }
+    }
+
+
 }
-
-
-
-
-
 

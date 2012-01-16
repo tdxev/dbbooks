@@ -5,12 +5,6 @@ class IndexController extends Zend_Controller_Action
 
     public function init()
     {
-      /*
-       + record user ip on registration
-       * 
-       * 
-       */
-
       /* Initialize action controller here */
     }
 
@@ -21,7 +15,16 @@ class IndexController extends Zend_Controller_Action
       
       $this->view->top_uploaders = $books->getTopUploaders(10);
     }
+
+
+
 }
+
+
+
+
+
+
 
 
 
